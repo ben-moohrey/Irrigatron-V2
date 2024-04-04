@@ -150,11 +150,6 @@ class RobotModule(BaseModule):
             except:
                 print("SERIAL WRITE FAILED")
 
-
-
-
-
-
     def update_motor_state(self, motor_state):
         try:
             self.motor_state.update(motor_state)  # = motor_state
@@ -227,7 +222,7 @@ class RobotModule(BaseModule):
             code_id = arucode_locations[0][0]
             # self.log((int)(loc[0]>0))
             area = arucode_locations[0][2]
-            self.log(area)
+            # self.log(area)
 
             if (area > 14000):
                 self.xyr_write(0,-0.1,0)

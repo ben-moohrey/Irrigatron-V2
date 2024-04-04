@@ -2,6 +2,7 @@ from modules.BaseModule import BaseModule
 from breezyslam.algorithms import RMHC_SLAM
 from breezyslam.sensors import RPLidarA1 as LaserModel
 from rplidar import RPLidar as Lidar
+import logging
 # from roboviz import MapVisualizer
 
 
@@ -17,9 +18,10 @@ class LidarModule(BaseModule):
         super().__init__(topics, thread_id, settings)
 
         self.lidar_frame_topic = topics.get_topic('lidar_frame')
+        self.lidar_map_topic = topics.get_topic('lidar_map')
 
         self.LIDAR_DEVICE = LIDAR_DEVICE
-        self.MAP_SIZE_PIXELS = 500
+        self.MAP_SIZE_PIXELS = 100
         self.MAP_SIZE_METERS = 10
 
         self.OBSTRUCTED_MIN_ANGLE = 180-20
@@ -29,7 +31,11 @@ class LidarModule(BaseModule):
         self.setup()
 
     def setup(self):
-        self.lidar = Lidar(self.LIDAR_DEVICE, baudrate=115200, timeout=3)
+        # DISABLE rplidar logging .. very annoying
+        logger = logging.getLogger('rplidar')
+        logger.propagate = False
+        logger.disabled = True
+        self.lidar = Lidar(self.LIDAR_DEVICE, baudrate=115200, timeout=3, logger=logger)
 
         self.slam = RMHC_SLAM(
             LaserModel(),
@@ -37,11 +43,11 @@ class LidarModule(BaseModule):
             self.MAP_SIZE_METERS,
         )
 
-        # self.viz      = M
+        # self.viz = MapVisualizer(self.MAP_SIZE_PIXELS, self.MAP_SIZE_METERS, 'SLAM')
         self.trajectory = []
         self.mapbytes = bytearray(self.MAP_SIZE_PIXELS * self.MAP_SIZE_PIXELS)
 
-        self.iterator = self.lidar.iter_scans()
+        self.iterator = self.lidar.iter_scans(max_buf_meas=600)
         self.prev_distances = None
         self.prev_angles = None
 
@@ -77,9 +83,16 @@ class LidarModule(BaseModule):
                 self.prev_distances,
                 scan_angles_degrees=self.prev_angles,
             )
+        
 
         self.x, self.y, self.theta = self.slam.getpos()
-        print(self.x, self.y, self.theta)
+        self.slam.getmap(self.mapbytes)
+        # self.viz.display((self.x/1000.), (self.y/1000.), self.theta, self.mapbytes)
+
+
+        self.lidar_frame_topic.write_data((self.x, self.y, self.theta))
+        self.lidar_map_topic.write_data(self.mapbytes)
+        # self.log(self.x, self.y, self.theta)
 
     def shutdown(self):
         self.lidar.stop()

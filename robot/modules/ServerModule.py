@@ -2,6 +2,10 @@ from modules.BaseModule import BaseModule
 import socket
 import json
 import time
+import base64
+import zlib
+import sys
+
 
 class ServerModule(BaseModule):
     def __init__(self, topics, thread_id, settings, server_ip, server_port):
@@ -14,6 +18,9 @@ class ServerModule(BaseModule):
         self.server_socket.listen(1)
 
         self.control_data_topic = self.topics.get_topic("control_data")
+        self.lidar_frame_topic = topics.get_topic('lidar_frame')
+        self.lidar_map_topic = topics.get_topic('lidar_map')
+
         self.server_socket.settimeout(0.5)
         self.retries = 0
         self.retry_count = 3
@@ -87,12 +94,37 @@ class ServerModule(BaseModule):
                     try:
 
                         control_data = json.loads(data.decode())
+
+                        response = {"status": "success", "message": "Data processed"}
                     except json.decoder.JSONDecodeError as e:
+                        response = {"status": "error", "message": "Invalid JSON"}
+
                         continue
+                    
+
                     self.control_data_topic.write_data(control_data)
+
+
+                    lidar_frame = self.lidar_frame_topic.read_data()
+                    lidar_map = self.lidar_map_topic.read_data()
+
+                    if (lidar_frame and lidar_map):
+                        response['lidar_frame'] = lidar_frame
+                        
+
+
+                        
+
+                    # print(sys.getsizeof(zlib.compress(lidar_map)))
+                    # response['lidar_map'] = list(zlib.compress(lidar_map))
+
+                    client_socket.sendall(json.dumps(response).encode('utf-8'))
+                    # client_socket.sendall(lidar_map)
                 except socket.error as e:
+                    print(e)
                     # Handle errors, e.g., client disconnected
                     break
+                
 
         # Clean up client connection
         if client_socket:

@@ -1,5 +1,5 @@
 from utils.Topics import Topics
-
+import logging
 class BaseModule:
     def __init__(self, topics: Topics, thread_id: int, settings: dict):
         self.topics = topics
