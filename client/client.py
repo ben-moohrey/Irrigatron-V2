@@ -2,6 +2,7 @@ import socket
 import tkinter as tk
 import json
 from XboxController import XboxController
+from tkinter import BooleanVar
 import math
 
 class JoystickGUI:
@@ -52,7 +53,20 @@ class JoystickGUI:
             fill="red",
         )
 
-        self.keys_pressed = {key: 0 for key in "wasdeqz"}
+
+                # Mode switch variable
+        self.auto_mode = BooleanVar(value=False)
+
+        # Create mode switch
+        self.mode_switch = tk.Checkbutton(
+            window, 
+            text='Auto Mode', 
+            variable=self.auto_mode, 
+            command=self.toggle_mode
+        )
+        self.mode_switch.pack(pady=5)
+
+        self.keys_pressed = {key: 0 for key in "wasdeqzp"}
         self.bind()
 
         # Joystick data
@@ -68,6 +82,7 @@ class JoystickGUI:
                 "rotation":{
                     "x": 0,
                 },
+                'water': 0
             },
         }
 
@@ -87,6 +102,11 @@ class JoystickGUI:
         key = event.keysym.lower()
         if key in self.keys_pressed:
             self.keys_pressed[key] = press_or_release
+
+    def toggle_mode(self):
+        mode = "auto" if self.auto_mode.get() else "manual"
+        self.control_data["mode"] = mode
+        print(f"Mode switched to {mode}")
 
     def normalize_sum_to_one(self, x, y):
         total = abs(x) + abs(y)
@@ -111,7 +131,7 @@ class JoystickGUI:
         x = 0
         y = 0
         rot = 0
-        z_kb = 0
+        water = 0
 
         keys_pressed = self.keys_pressed
 
@@ -120,7 +140,7 @@ class JoystickGUI:
             y_in = keys_pressed["w"] - keys_pressed["s"]
             x, y = self.normalize_sum_to_one(x_in, y_in)
 
-            z_kb = keys_pressed['z']
+            water = keys_pressed['p']
 
 
 
@@ -134,9 +154,12 @@ class JoystickGUI:
             rot = self.controller.x_axis_right
             x, y = self.normalize_sum_to_one(x_in, y_in)
 
+            water = self.controller.rb_button
+
         self.control_data['controls']['translation']["x"] = round(x,2)
         self.control_data['controls']['translation']["y"] = round(y,2)
         self.control_data['controls']['rotation']['x'] = round(rot,2)
+        self.control_data['controls']['water'] = water
             
 
         self.send_control_data()
@@ -167,8 +190,8 @@ window = tk.Tk()
 window.title("Joystick Control")
 
 # Server configuration
-SERVER_IP = "127.0.0.1"
-# SERVER_IP = '10.144.113.75'
+# SERVER_IP = "127.0.0.1"
+SERVER_IP = '10.144.113.182'
 SERVER_PORT = 8003
 
 try:

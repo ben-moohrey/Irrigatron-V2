@@ -1,11 +1,10 @@
-#import hid
+import hid
 
 class XboxController:
     VENDOR_ID = 1118  # Microsoft
     PRODUCT_ID = 2835  # Xbox One S controller
     
     def __init__(self, deadzone = 0):
-        import hid
         self.gamepad = hid.device()
         self.gamepad.open(self.VENDOR_ID, self.PRODUCT_ID)
         self.gamepad.set_nonblocking(True)
@@ -62,22 +61,19 @@ class XboxController:
 
     def parse_report(self, report):
 
-        # hex_report = []
-        # # for i in range(len(report)):
-        # #     hex_report.append(str(i)+ ": " + hex(report[i]))
-        # # print(hex_report)
-        self.a_button = report[14] & 0x1  
-        self.b_button = report[14] & 0x2
-        self.x_button = report[14] & 0x8
-        self.y_button = report[14] & 0x10
-        self.rb_button = report[14] & 0x80
-        self.lb_button = report[14] & 0x40
+
+        self.a_button = int(report[14] & 0x1 > 0)
+        self.b_button = int(report[14] & 0x2 > 0)
+        self.x_button = int(report[14] & 0x8 > 0)
+        self.y_button = int(report[14] & 0x10 > 0)
+        self.rb_button = int(report[14] & 0x80 > 0)
+        self.lb_button = int(report[14] & 0x40 > 0)
 
         # d-pad
-        self.up_dpad    = report[13] & 0x1
-        self.right_dpad = report[13] & 0x3
-        self.left_dpad  = report[13] & 0x7
-        self.down_dpad  = report[13] & 0x5
+        self.up_dpad    = int(report[13] & 0x1 > 0)
+        self.right_dpad = int(report[13] & 0x3 > 0)
+        self.left_dpad  = int(report[13] & 0x7 > 0)
+        self.down_dpad  = int(report[13] & 0x5 > 0)
     
         # Triger
         self.l_trigger_raw = (report[9] | (report[10] << 8)) # / 0x3ff
