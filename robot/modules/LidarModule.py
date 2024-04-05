@@ -14,6 +14,8 @@ class LidarModule(BaseModule):
         settings,
         LIDAR_DEVICE,
         MIN_SAMPLES,
+        MAP_SIZE_PIXELS,
+        MAP_SIZE_METERS,
     ):
         super().__init__(topics, thread_id, settings)
 
@@ -21,11 +23,11 @@ class LidarModule(BaseModule):
         self.lidar_map_topic = topics.get_topic('lidar_map')
 
         self.LIDAR_DEVICE = LIDAR_DEVICE
-        self.MAP_SIZE_PIXELS = 100
-        self.MAP_SIZE_METERS = 10
+        self.MAP_SIZE_PIXELS = MAP_SIZE_PIXELS
+        self.MAP_SIZE_METERS = MAP_SIZE_METERS
 
-        self.OBSTRUCTED_MIN_ANGLE = 180-20
-        self.OBSTRUCTED_MAX_ANGLE = 180+20
+        self.OBSTRUCTED_MIN_ANGLE = 180-40
+        self.OBSTRUCTED_MAX_ANGLE = 180+40
 
         self.MIN_SAMPLES = MIN_SAMPLES
         self.setup()
@@ -41,6 +43,7 @@ class LidarModule(BaseModule):
             LaserModel(),
             self.MAP_SIZE_PIXELS,
             self.MAP_SIZE_METERS,
+            hole_width_mm=2000,
         )
 
         # self.viz = MapVisualizer(self.MAP_SIZE_PIXELS, self.MAP_SIZE_METERS, 'SLAM')
@@ -64,14 +67,16 @@ class LidarModule(BaseModule):
         angles = []
         for q, angle, distance in items:
             real_angle = (-angle+360)%360
-            if real_angle >= self.OBSTRUCTED_MIN_ANGLE and real_angle <= self.OBSTRUCTED_MAX_ANGLE:
-                continue
-            # if angle >= OBSTRUCTED_MIN_ANGLE and angle <= OBSTRUCTED_MAX_ANGLE:
-            #     continue
-            distances.append(distance)
-            angles.append(real_angle)
-            # distances.append(distance)
-            # angles.append((-angle+360)%360)
+            if (real_angle+180)%360 >= self.OBSTRUCTED_MIN_ANGLE and (real_angle+180)%360 <= self.OBSTRUCTED_MAX_ANGLE:
+
+                pass
+            else:
+                # if angle >= OBSTRUCTED_MIN_ANGLE and angle <= OBSTRUCTED_MAX_ANGLE:
+                #     continue
+                distances.append(distance)
+                angles.append(real_angle)
+                # distances.append(distance)
+                # angles.append((-angle+360)%360)
 
         if len(distances) > self.MIN_SAMPLES:
             self.slam.update(distances, scan_angles_degrees=angles)

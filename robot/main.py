@@ -8,19 +8,19 @@ import time
 from settings import settings
 from roboviz import MapVisualizer
 # Server
-SERVER_IP = "10.144.113.182"
+SERVER_IP = "10.144.113.61"
 # SERVER_IP = '127.0.0.1'
 SERVER_PORT = 8003
 SERIAL_PORT = '/dev/ttyACM0'
 
 # Robot
-MOTOR_SPEED_MAX = 600
+MOTOR_SPEED_MAX = 500
 MOTOR_SPEED_MIN = 50
 MOTOR_TURN_SPEED = 255
 SERIAL_BAUD_RATE = 115200
 
 MAP_SIZE_PIXELS = 100
-MAP_SIZE_METERS = 10
+MAP_SIZE_METERS = 5
 def main():
     viz = MapVisualizer(MAP_SIZE_PIXELS, MAP_SIZE_METERS, 'SLAM')
     topics = Topics(settings.get('default_topics'))
@@ -53,7 +53,12 @@ def main():
         # },
         {
             'module': LidarModule,
-            'args': ('/dev/ttyUSB0', 50,),
+            'args': (
+                '/dev/ttyUSB0',
+                100,
+                MAP_SIZE_PIXELS,
+                MAP_SIZE_METERS,
+            ),
             'id': 'LidarModule',
         },
         
