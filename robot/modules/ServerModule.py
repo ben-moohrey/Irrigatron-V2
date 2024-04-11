@@ -108,8 +108,8 @@ class ServerModule(BaseModule):
                     lidar_frame = self.lidar_frame_topic.read_data()
                     lidar_map = self.lidar_map_topic.read_data()
 
-                    if (lidar_frame and lidar_map):
-                        response['lidar_frame'] = lidar_frame
+                    # if (lidar_frame and lidar_map):
+                    #     response['lidar_frame'] = lidar_frame
                         
 
 

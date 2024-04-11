@@ -256,7 +256,9 @@ class RobotModule(BaseModule):
         self.serial_conn.close()
 
     def run(self, shutdown_flag):
+        
         control_data = self.control_data_topic.read_data()
+        print(control_data)
         if control_data:
             match control_data.get('mode'):
                 case 'auto':

@@ -1,5 +1,7 @@
 import threading
-from utils.Topics import Topics
+import multiprocessing
+
+from utils.TopicsProcess import Topics
 from modules.ServerModule import ServerModule
 from modules.RobotModule import RobotModule
 from modules.CameraModule import CameraModule
@@ -69,7 +71,7 @@ def main():
         args = modules[i].get('args')
         thread_id = modules[i].get('id')
 
-        thread = threading.Thread(
+        thread = multiprocessing.Process( # threading.Thread( # multiprocessing.Proces
             target=module.spawn,
             args=(
                 shutdown_flag,
@@ -91,8 +93,8 @@ def main():
             if (lidar_map_topic.read_data()):
                 lidar_map = lidar_map_topic.read_data()
                 x,y,theta = lidar_frame_topic.read_data()
-                
-                viz.display((x/1000.), (y/1000.), theta, lidar_map)
+                print(x)
+                # viz.display((x/1000.), (y/1000.), theta, lidar_map)
             # time.sleep(0.05)
 
     except KeyboardInterrupt:

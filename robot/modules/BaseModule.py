@@ -1,4 +1,4 @@
-from utils.Topics import Topics
+from utils.TopicsProcess import Topics
 import logging
 class BaseModule:
     def __init__(self, topics: Topics, thread_id: int, settings: dict):
