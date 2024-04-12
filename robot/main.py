@@ -8,7 +8,7 @@ from modules.CameraModule import CameraModule
 from modules.LidarModule import LidarModule
 import time
 from settings import settings
-from roboviz import MapVisualizer
+# from roboviz import MapVisualizer
 # Server
 SERVER_IP = "10.144.113.61"
 # SERVER_IP = '127.0.0.1'
@@ -22,12 +22,12 @@ MOTOR_TURN_SPEED = 255
 SERIAL_BAUD_RATE = 115200
 
 MAP_SIZE_PIXELS = 100
-MAP_SIZE_METERS = 5
+MAP_SIZE_METERS = 10
 def main():
-    viz = MapVisualizer(MAP_SIZE_PIXELS, MAP_SIZE_METERS, 'SLAM')
+    # viz = MapVisualizer(MAP_SIZE_PIXELS, MAP_SIZE_METERS, 'SLAM BRUH')
     topics = Topics(settings.get('default_topics'))
-    threads = []
-    shutdown_flag = threading.Event()
+    processes = []
+    shutdown_flag = multiprocessing.Event()
 
     modules = [
         {
@@ -48,65 +48,65 @@ def main():
             ),
             'id': 'RobotModule',
         },
-        # {
-        #     'module': CameraModule,
-        #     'args': (),
-        #     'id': 'CameraModule',
-        # },
         {
-            'module': LidarModule,
-            'args': (
-                '/dev/ttyUSB0',
-                100,
-                MAP_SIZE_PIXELS,
-                MAP_SIZE_METERS,
-            ),
-            'id': 'LidarModule',
+            'module': CameraModule,
+            'args': (),
+            'id': 'CameraModule',
         },
+        # {
+        #     'module': LidarModule,
+        #     'args': (
+        #         '/dev/ttyUSB0',
+        #         50,
+        #         MAP_SIZE_PIXELS,
+        #         MAP_SIZE_METERS,
+        #     ),
+        #     'id': 'LidarModule',
+        # },
         
     ]
 
     for i in range(0, len(modules)):
         module = modules[i].get('module')
         args = modules[i].get('args')
-        thread_id = modules[i].get('id')
+        process_id = modules[i].get('id')
 
-        thread = multiprocessing.Process( # threading.Thread( # multiprocessing.Proces
+        process = multiprocessing.Process( # threading.Thread( # multiprocessing.Proces
             target=module.spawn,
             args=(
                 shutdown_flag,
                 topics,
-                thread_id,
+                process_id,
                 settings,
                 args,
             ),
         )
-        thread.start()
-        threads.append(thread)
+        process.start()
+        processes.append(process)
 
 
     lidar_frame_topic = topics.get_topic('lidar_frame')
     lidar_map_topic = topics.get_topic('lidar_map')
     try:
         while True:
-
-            if (lidar_map_topic.read_data()):
-                lidar_map = lidar_map_topic.read_data()
-                x,y,theta = lidar_frame_topic.read_data()
-                print(x)
-                # viz.display((x/1000.), (y/1000.), theta, lidar_map)
-            # time.sleep(0.05)
+            continue
+            # if (lidar_map_topic.read_data()):
+            #     lidar_map = lidar_map_topic.read_data()
+            #     x,y,theta = lidar_frame_topic.read_data()
+            #     # print(x)
+            #     # viz.display((x/1000.), (y/1000.), theta, lidar_map)
+            # # time.sleep(0.05)
 
     except KeyboardInterrupt:
-        print('\n[MAIN] > Shutting Down all Threads Gracefully \n')
+        print('\n[MAIN] > Shutting Down all processes Gracefully \n')
         shutdown_flag.set()
 
     try:
-        for thread in threads:
-            thread.join()
+        for process in processes:
+            process.join()
         print('Successfully Shutdown All Modules')
-    except threading.ThreadError as e:
-        print('Error Shutting Down Threads')
+    except multiprocessing.ProcessError as e:
+        print('Error Shutting Down Processes')
         print('STACK TRACE BELOW\n')
         print('--------------------')
         print(e)

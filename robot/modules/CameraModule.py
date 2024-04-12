@@ -12,7 +12,7 @@ class CameraModule(BaseModule):
         ): 
             super().__init__(topics, thread_id, settings)
 
-            self.cap = cv2.VideoCapture(4)
+            self.cap = cv2.VideoCapture(0)
 
 
             if not self.cap.isOpened():
@@ -21,6 +21,8 @@ class CameraModule(BaseModule):
             self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
 
             self.aruco_dict = aruco.getPredefinedDictionary(aruco.DICT_6X6_250)
+            parameters =  cv2.aruco.DetectorParameters()
+            self.detector = cv2.aruco.ArucoDetector(self.aruco_dict, parameters)
 
             self.arucode_locations_topic = self.topics.get_topic("arucode_locations_topic")
 
@@ -40,7 +42,7 @@ class CameraModule(BaseModule):
 
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         ids = []
-        corners, ids, rejectedImgPoints = aruco.detectMarkers(gray, self.aruco_dict)
+        corners, ids, rejectedImgPoints = self.detector.detectMarkers(gray)
 
         if len(corners) > 0:
             # aruco.drawDetectedMarkers(frame, corners, ids)
@@ -62,6 +64,7 @@ class CameraModule(BaseModule):
                 # Log ID, centroid, and position relative to center
                 ##self.log(f"ID: {i}, Centroid: {centroid}, Position from Center: {position_from_center}")
                 ids_and_position.append((i,position_from_center.tolist(),area))
+
                 
                 # self.log(position_from_center[0])
             last_ids_and_position = self.arucode_locations_topic.read_data()

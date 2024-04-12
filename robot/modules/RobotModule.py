@@ -118,14 +118,14 @@ class RobotModule(BaseModule):
 
                 self.serial_conn.write(serial_string)
             except:
-                print("SERIAL WRITE FAILED")
+                self.log("SERIAL WRITE FAILED")
         else:
             print('no longer pumpin!')
             serial_string = f'x\n'.encode()
             try:
                 self.serial_conn.write(serial_string)
             except:
-                print("SERIAL WRITE FAILED")
+                self.log("SERIAL WRITE FAILED")
 
     def move_arm(self, val: str):
 
@@ -134,29 +134,30 @@ class RobotModule(BaseModule):
             try:
                 self.serial_conn.write(serial_string)
             except:
-                print("SERIAL WRITE FAILED")
+                self.log("SERIAL WRITE FAILED")
         elif (val == 'm'):
 
             serial_string = f'm\n'.encode()
             try:
                 self.serial_conn.write(serial_string)
             except:
-                print("SERIAL WRITE FAILED")
+                self.log("SERIAL WRITE FAILED")
 
         elif (val == 'h'):
             serial_string = f'h\n'.encode()
             try:
                 self.serial_conn.write(serial_string)
             except:
-                print("SERIAL WRITE FAILED")
+                self.log("SERIAL WRITE FAILED")
 
     def update_motor_state(self, motor_state):
         try:
             self.motor_state.update(motor_state)  # = motor_state
         except:
-                print("SERIAL WRITE FAILED")
+                self.log("SERIAL WRITE FAILED")
 
     def write_to_serial(self, motor_state):
+        # self.log("WRITING TO SERIAL")
         if motor_state != self.motor_state:
             self.update_motor_state(motor_state)
             msv = list(self.motor_state.values())
@@ -164,12 +165,13 @@ class RobotModule(BaseModule):
             try:
                 self.serial_conn.write(serial_string)
             except:
-                print("SERIAL WRITE FAILED")
+                self.log("SERIAL WRITE FAILED")
 
     def manual(self, control_data):
         self.serial_control(control_data)
 
     def serial_control(self, control_data):
+        #self.log("Bruh")
         motor_state = self.xy_state_to_motor_state(control_data)
         self.write_to_serial(motor_state)
         try:
@@ -215,8 +217,7 @@ class RobotModule(BaseModule):
 
         arucode_locations = self.arucode_locations_topic.read_data()
         if arucode_locations:
-            
-
+    
 
             loc = arucode_locations[0][1]
             code_id = arucode_locations[0][0]
@@ -256,9 +257,8 @@ class RobotModule(BaseModule):
         self.serial_conn.close()
 
     def run(self, shutdown_flag):
-        
+        #self.log("BRUH")
         control_data = self.control_data_topic.read_data()
-        print(control_data)
         if control_data:
             match control_data.get('mode'):
                 case 'auto':
