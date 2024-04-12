@@ -21,8 +21,8 @@ class CameraModule(BaseModule):
             self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
 
             self.aruco_dict = aruco.getPredefinedDictionary(aruco.DICT_6X6_250)
-            parameters =  cv2.aruco.DetectorParameters()
-            self.detector = cv2.aruco.ArucoDetector(self.aruco_dict, parameters)
+            parameters =  aruco.DetectorParameters()
+            self.detector = aruco.ArucoDetector(self.aruco_dict, parameters)
 
             self.arucode_locations_topic = self.topics.get_topic("arucode_locations_topic")
 
@@ -42,11 +42,9 @@ class CameraModule(BaseModule):
 
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         ids = []
-        corners, ids, rejectedImgPoints = self.detector.detectMarkers(gray)
-
+        corners, ids, rejectedImgPoints = self.detector.detectMarkers(frame)
         if len(corners) > 0:
             # aruco.drawDetectedMarkers(frame, corners, ids)
-
             ids_and_position = []
             for i, corner in zip(ids.flatten(), corners):
                 # Calculate the centroid of the marker

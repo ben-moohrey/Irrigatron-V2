@@ -37,6 +37,9 @@ class RobotModule(BaseModule):
             'basic_path': self.settings.get('basic_path'),
         }
 
+        self.state_auto_2 = {
+            'state': 'wander',
+        }
 
     def lerp(self, lerp, lower, upper):
         if lerp > 1:
@@ -128,7 +131,7 @@ class RobotModule(BaseModule):
                 self.log("SERIAL WRITE FAILED")
 
     def move_arm(self, val: str):
-
+        return
         if (val == 'l'):
             serial_string = f'l\n'.encode()
             try:
@@ -188,6 +191,7 @@ class RobotModule(BaseModule):
             self.pump(water)
 
     def auto(self):
+        
         basic_path = self.state_auto.get('basic_path')
         path_index = self.state_auto.get('path_index')
         current_path = basic_path[path_index]
@@ -214,30 +218,44 @@ class RobotModule(BaseModule):
                 self.state_auto['path_index'] += 1
 
     def auto_2(self):
+        change_state = lambda s : self.state_auto_2.update({'state': s})
+        match self.state_auto_2['state']:
+            case 'code':
+                arucode_locations = self.arucode_locations_topic.read_data()
+                if arucode_locations:
 
-        arucode_locations = self.arucode_locations_topic.read_data()
-        if arucode_locations:
-    
 
-            loc = arucode_locations[0][1]
-            code_id = arucode_locations[0][0]
-            # self.log((int)(loc[0]>0))
-            area = arucode_locations[0][2]
-            # self.log(area)
+                    loc = arucode_locations[0][1]
+                    code_id = arucode_locations[0][0]
+                    # self.log((int)(loc[0]>0))
+                    area = arucode_locations[0][2]
+                    # self.log(area)
 
-            if (area > 14000):
-                self.xyr_write(0,-0.1,0)
-            elif (area < 10000):
-                self.xyr_write(0,0.1,0)
-            else:
-                if (code_id==0):
-                    self.xyrh_write(0,0,0, 'l')
-                elif (code_id==1):
-                    self.xyrh_write(0,0,0, 'm')
-                elif (code_id==2):
-                    self.xyrh_write(0,0,0, 'h')
-                else:
-                     self.xyr_write(0,0,0)
+                    if (area > 14000):
+                        self.xyr_write(0,-0.1,0)
+                    elif (area < 10000):
+                        self.xyr_write(0,0.1,0)
+                    else:
+                        if (code_id==0):
+                            self.xyrh_write(0,0,0, 'l')
+                        elif (code_id==1):
+                            self.xyrh_write(0,0,0, 'm')
+                        elif (code_id==2):
+                            self.xyrh_write(0,0,0, 'h')
+                        else:
+                                self.xyr_write(0,0,0)
+                return 0
+            case 'wander':
+                self.xyr_write(0,0,0.1)
+                arucode_locations = self.arucode_locations_topic.read_data()
+                # self.log(arucode_locations)
+                # self.log('testing')
+                if arucode_locations:
+                    change_state('code')
+                    # print('test')
+                return 0
+
+                    
            
 
             # x = loc[0]
@@ -279,7 +297,7 @@ class RobotModule(BaseModule):
                     self.robot_state = 'auto'
                 return 1
             case 'idle':
-                if (time.time() - self.__STARTUP_TIME_T__.read_data() > 2):
+                if (time.time() - self.__STARTUP_TIME_T__.read_data() > 4):
                     self.robot_state = 'auto' # DONT GO INTO AUTO
                     return 1
             case _:

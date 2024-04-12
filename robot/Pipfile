@@ -10,6 +10,8 @@ opencv-python = "*"
 breezyslam = {path = "/home/irrigatron/BreezySLAM/python"}
 roboviz = {path = "/home/irrigatron/PyRoboViz"}
 rplidar = "*"
+"rpi.gpio" = "*"
+opencv-contrib-python = "*"
 
 [dev-packages]
 
