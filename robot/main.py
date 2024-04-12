@@ -6,7 +6,7 @@ from modules.CameraModule import CameraModule
 from modules.LidarModule import LidarModule
 import time
 from settings import settings
-from roboviz import MapVisualizer
+# from roboviz import MapVisualizer
 # Server
 SERVER_IP = "10.144.113.61"
 # SERVER_IP = '127.0.0.1'
@@ -22,7 +22,7 @@ SERIAL_BAUD_RATE = 115200
 MAP_SIZE_PIXELS = 100
 MAP_SIZE_METERS = 5
 def main():
-    viz = MapVisualizer(MAP_SIZE_PIXELS, MAP_SIZE_METERS, 'SLAM')
+    # viz = MapVisualizer(MAP_SIZE_PIXELS, MAP_SIZE_METERS, 'SLAM')
     topics = Topics(settings.get('default_topics'))
     threads = []
     shutdown_flag = threading.Event()
@@ -46,21 +46,21 @@ def main():
             ),
             'id': 'RobotModule',
         },
-        # {
-        #     'module': CameraModule,
-        #     'args': (),
-        #     'id': 'CameraModule',
-        # },
         {
-            'module': LidarModule,
-            'args': (
-                '/dev/ttyUSB0',
-                100,
-                MAP_SIZE_PIXELS,
-                MAP_SIZE_METERS,
-            ),
-            'id': 'LidarModule',
+            'module': CameraModule,
+            'args': (),
+            'id': 'CameraModule',
         },
+        # {
+        #     'module': LidarModule,
+        #     'args': (
+        #         '/dev/ttyUSB0',
+        #         100,
+        #         MAP_SIZE_PIXELS,
+        #         MAP_SIZE_METERS,
+        #     ),
+        #     'id': 'LidarModule',
+        # },
         
     ]
 
@@ -92,7 +92,7 @@ def main():
                 lidar_map = lidar_map_topic.read_data()
                 x,y,theta = lidar_frame_topic.read_data()
                 
-                viz.display((x/1000.), (y/1000.), theta, lidar_map)
+                # viz.display((x/1000.), (y/1000.), theta, lidar_map)
             # time.sleep(0.05)
 
     except KeyboardInterrupt:
