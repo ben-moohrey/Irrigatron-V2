@@ -20,7 +20,7 @@ class ServerModule(BaseModule):
         self.control_data_topic = self.topics.get_topic("control_data")
         self.lidar_frame_topic = topics.get_topic('lidar_frame')
         self.lidar_map_topic = topics.get_topic('lidar_map')
-
+        self.server_response_data_topic = topics.get_topic('server_response_data_topic')
         self.server_socket.settimeout(0.5)
         self.retries = 0
         self.retry_count = 3
@@ -63,7 +63,7 @@ class ServerModule(BaseModule):
 
     def shutdown(self):
         self.server_socket.close()
-
+        
     def run(self, shutdown_flag):
         self.log("Waiting for a connection...")
 
@@ -86,6 +86,7 @@ class ServerModule(BaseModule):
         if client_socket:
             client_socket.setblocking(1)  # Set blocking mode for recv calls
             while not shutdown_flag.is_set():
+                response = {"status": "success", "message": "Data processed"}
                 try:
                     data = client_socket.recv(1024)
                     if not data:
@@ -94,36 +95,90 @@ class ServerModule(BaseModule):
                     try:
 
                         control_data = json.loads(data.decode())
-
                         response = {"status": "success", "message": "Data processed"}
                     except json.decoder.JSONDecodeError as e:
-                        response = {"status": "error", "message": "Invalid JSON"}
-
+                        response = {"status": "failure", "message": "Json Decode Error"}
                         continue
-                    
 
+                    
                     self.control_data_topic.write_data(control_data)
 
 
-                    lidar_frame = self.lidar_frame_topic.read_data()
-                    lidar_map = self.lidar_map_topic.read_data()
+                
 
-                    if (lidar_frame and lidar_map):
-                        response['lidar_frame'] = lidar_frame
-                        
-
-
-                        
-
-                    # print(sys.getsizeof(zlib.compress(lidar_map)))
-                    # response['lidar_map'] = list(zlib.compress(lidar_map))
-
-                    client_socket.sendall(json.dumps(response).encode('utf-8'))
-                    # client_socket.sendall(lidar_map)
+                    
                 except socket.error as e:
-                    print(e)
                     # Handle errors, e.g., client disconnected
                     break
+                # self.log(sys.getsizeof(self.server_response_data_topic.read_data()))
+                server_response_data = self.server_response_data_topic.read_data()
+                if server_response_data is not None:
+                    response['plant_data'] = server_response_data
+
+                    # self.server_response_data_topic.write_data(None)
+               
+                client_socket.sendall(json.dumps(response).encode('utf-8'))
+
+    # def run(self, shutdown_flag):
+    #     self.log("Waiting for a connection...")
+
+    #     client_socket = None
+    #     addr = None
+
+    #     # Loop until shutdown_flag is set
+    #     while not shutdown_flag.is_set():
+    #         try:
+    #             client_socket, addr = self.server_socket.accept()
+    #             self.log("Connected to:", addr)
+    #             break
+    #         except socket.timeout:
+    #             continue  # Go back to start of loop and check shutdown_flag again
+    #         except socket.error as e:
+    #             # Handle error (if necessary)
+    #             continue
+
+    #     # If a client connected successfully
+    #     if client_socket:
+    #         client_socket.setblocking(1)  # Set blocking mode for recv calls
+    #         while not shutdown_flag.is_set():
+    #             try:
+    #                 data = client_socket.recv(1024)
+    #                 if not data:
+    #                     break  # No more data, exit loop
+    #                 # Process data
+    #                 try:
+
+    #                     control_data = json.loads(data.decode())
+
+    #                     response = {"status": "success", "message": "Data processed"}
+    #                 except json.decoder.JSONDecodeError as e:
+    #                     response = {"status": "error", "message": "Invalid JSON"}
+
+    #                     continue
+                    
+
+    #                 self.control_data_topic.write_data(control_data)
+
+
+    #                 lidar_frame = self.lidar_frame_topic.read_data()
+    #                 lidar_map = self.lidar_map_topic.read_data()
+
+    #                 # if (lidar_frame and lidar_map):
+    #                 #     response['lidar_frame'] = lidar_frame
+                        
+
+
+                        
+
+    #                 # print(sys.getsizeof(zlib.compress(lidar_map)))
+    #                 # response['lidar_map'] = list(zlib.compress(lidar_map))
+
+    #                 client_socket.sendall(json.dumps(response).encode('utf-8'))
+    #                 # client_socket.sendall(lidar_map)
+    #             except socket.error as e:
+    #                 print(e)
+    #                 # Handle errors, e.g., client disconnected
+    #                 break
                 
 
         # Clean up client connection

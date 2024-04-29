@@ -43,7 +43,7 @@ class LidarModule(BaseModule):
             LaserModel(),
             self.MAP_SIZE_PIXELS,
             self.MAP_SIZE_METERS,
-            hole_width_mm=2000,
+            # hole_width_mm=2000,
         )
 
         # self.viz = MapVisualizer(self.MAP_SIZE_PIXELS, self.MAP_SIZE_METERS, 'SLAM')

@@ -1,9 +1,12 @@
 import threading
-from utils.Topics import Topics
+import multiprocessing
+
+from utils.TopicsProcess import Topics
 from modules.ServerModule import ServerModule
 from modules.RobotModule import RobotModule
 from modules.CameraModule import CameraModule
-from modules.LidarModule import LidarModule
+# from modules.SimpleLidarModule import SimpleLidarModule
+from modules.StepperModule import StepperModule
 import time
 from settings import settings
 # from roboviz import MapVisualizer
@@ -14,18 +17,20 @@ SERVER_PORT = 8003
 SERIAL_PORT = '/dev/ttyACM0'
 
 # Robot
-MOTOR_SPEED_MAX = 500
+MOTOR_SPEED_MAX = 350
 MOTOR_SPEED_MIN = 50
 MOTOR_TURN_SPEED = 255
 SERIAL_BAUD_RATE = 115200
 
 MAP_SIZE_PIXELS = 100
-MAP_SIZE_METERS = 5
+MAP_SIZE_METERS = 10
 def main():
+
     # viz = MapVisualizer(MAP_SIZE_PIXELS, MAP_SIZE_METERS, 'SLAM')
+
     topics = Topics(settings.get('default_topics'))
-    threads = []
-    shutdown_flag = threading.Event()
+    processes = []
+    shutdown_flag = multiprocessing.Event()
 
     modules = [
         {
@@ -51,15 +56,18 @@ def main():
             'args': (),
             'id': 'CameraModule',
         },
+        {
+            'module': StepperModule,
+            'args': (),
+            'id': 'StepperModule',
+        },
         # {
-        #     'module': LidarModule,
+        #     'module': SimpleLidarModule,
         #     'args': (
         #         '/dev/ttyUSB0',
-        #         100,
-        #         MAP_SIZE_PIXELS,
-        #         MAP_SIZE_METERS,
         #     ),
-        #     'id': 'LidarModule',
+        #     'id': 'SimpleLidarModule',
+
         # },
         
     ]
@@ -67,44 +75,60 @@ def main():
     for i in range(0, len(modules)):
         module = modules[i].get('module')
         args = modules[i].get('args')
-        thread_id = modules[i].get('id')
+        process_id = modules[i].get('id')
 
-        thread = threading.Thread(
+        process = multiprocessing.Process( # threading.Thread( # multiprocessing.Proces
             target=module.spawn,
             args=(
                 shutdown_flag,
                 topics,
-                thread_id,
+                process_id,
                 settings,
                 args,
             ),
         )
-        thread.start()
-        threads.append(thread)
+        process.start()
+        processes.append(process)
 
 
-    lidar_frame_topic = topics.get_topic('lidar_frame')
-    lidar_map_topic = topics.get_topic('lidar_map')
+    # lidar_frame_topic = topics.get_topic('lidar_frame')
+    # lidar_map_topic = topics.get_topic('lidar_map')
+    stepper_location_topic =  topics.get_topic("stepper_location_topic")
+    obstacle_detected_topic = topics.get_topic('obstacle_detected_topic')
     try:
-        while True:
 
-            if (lidar_map_topic.read_data()):
-                lidar_map = lidar_map_topic.read_data()
-                x,y,theta = lidar_frame_topic.read_data()
-                
-                # viz.display((x/1000.), (y/1000.), theta, lidar_map)
-            # time.sleep(0.05)
+        # stepper_location_topic.write_data(StepperModule.POSITION_HIGH)
+        # stepper_location_topic.write_data(100)
+        while not shutdown_flag.is_set():
+            # print(obstacle_detected_topic.read_data())
+            # data = input("Input a stepper number")
+            # data = -data
+            
+            # print(stepper_location_topic.read_data())
+            time.sleep(0.5)
+            # if (lidar_map_topic.read_data()):
+            #     lidar_map = lidar_map_topic.read_data()
+            #     x,y,theta = lidar_frame_topic.read_data()
+            #     # print(x)
+            #     # viz.display((x/1000.), (y/1000.), theta, lidar_map)
+            # # time.sleep(0.05)
+
 
     except KeyboardInterrupt:
-        print('\n[MAIN] > Shutting Down all Threads Gracefully \n')
+        print('\n[MAIN] > Shutting Down all processes Gracefully \n')
         shutdown_flag.set()
 
     try:
-        for thread in threads:
-            thread.join()
+        for process in processes:
+            process.join(timeout=10)
+
+            if process.is_alive():
+                print(f"[WARNING] Process {process.name} did not terminate. Attempting to terminate forcefully.")
+                process.terminate()
+                process.join()
         print('Successfully Shutdown All Modules')
-    except threading.ThreadError as e:
-        print('Error Shutting Down Threads')
+    except multiprocessing.ProcessError as e:
+        print('Error Shutting Down Processes')
         print('STACK TRACE BELOW\n')
         print('--------------------')
         print(e)

@@ -2,7 +2,7 @@ import cv2
 import cv2.aruco as aruco
 
 def main():
-    cap = cv2.VideoCapture(4)
+    cap = cv2.VideoCapture(0)
 
     if not cap.isOpened():
         print("error could not open device")
