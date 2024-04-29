@@ -20,7 +20,7 @@ class ServerModule(BaseModule):
         self.control_data_topic = self.topics.get_topic("control_data")
         self.lidar_frame_topic = topics.get_topic('lidar_frame')
         self.lidar_map_topic = topics.get_topic('lidar_map')
-
+        self.server_response_data_topic = topics.get_topic('server_response_data_topic')
         self.server_socket.settimeout(0.5)
         self.retries = 0
         self.retry_count = 3
@@ -99,13 +99,24 @@ class ServerModule(BaseModule):
                     except json.decoder.JSONDecodeError as e:
                         response = {"status": "failure", "message": "Json Decode Error"}
                         continue
+
+                    
                     self.control_data_topic.write_data(control_data)
 
+
+                
 
                     
                 except socket.error as e:
                     # Handle errors, e.g., client disconnected
                     break
+                # self.log(sys.getsizeof(self.server_response_data_topic.read_data()))
+                server_response_data = self.server_response_data_topic.read_data()
+                if server_response_data is not None:
+                    response['plant_data'] = server_response_data
+
+                    # self.server_response_data_topic.write_data(None)
+               
                 client_socket.sendall(json.dumps(response).encode('utf-8'))
 
     # def run(self, shutdown_flag):

@@ -25,4 +25,5 @@ class BaseModule:
         module = cls(topics, thread_id, settings, *args)
         while not shutdown_flag.is_set():
             module.run(shutdown_flag)
+
         

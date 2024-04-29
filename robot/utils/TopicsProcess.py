@@ -12,6 +12,7 @@ class Topic:
 
     def read_data(self):
         # Reading data is non-blocking as manager.dict takes care of synchronization
+        
         return self.data['value']
 
 class Topics:

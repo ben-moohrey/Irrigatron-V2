@@ -1,0 +1,124 @@
+{
+    "plants": [
+        {
+            "aruco_code": 0,
+            "name": "Fiddle Leaf Fig",
+            "type": "Indoor Plant",
+            "watering_schedule": {
+                "frequency": "weekly",
+                "last_time_watered": 1713008045.2322826
+            },
+            "is_watered": true,
+            "height": "low",
+            "additional_notes": "Prefers indirect sunlight and high humidity."
+        },
+        {
+            "aruco_code": 1,
+            "name": "Snake Plant",
+            "type": "Indoor Plant",
+            "watering_schedule": {
+                "frequency": "biweekly",
+                "last_walast_time_wateredter_time": 1713008045.2322826
+            },
+            "is_watered": true,
+            "height": "medium",
+            "additional_notes": "Very drought tolerant; prefers dry conditions."
+        },
+        {
+            "aruco_code": 2,
+            "name": "Mass Cane",
+            "type": "Indoor Plant",
+            "watering_schedule": {
+                "frequency": "biweekly",
+                "last_time_watered": 1713008045.2322826
+            },
+            "is_watered": true,
+            "height": "medium",
+            "additional_notes": "Low maintenance, native to African tropics, vibrant green leaves."
+        },
+        {
+            "aruco_code": 3,
+            "name": "Fake Fern",
+            "type": "Fake",
+            "watering_schedule": {
+                "frequency": "Never",
+                "last_time_watered": 1713008045.2322826
+            },
+            "is_watered": true,
+            "height": "high",
+            "additional_notes": "You do not need to water fake plants."
+        },
+        {
+            "aruco_code": 4,
+            "name": "Orchid",
+            "type": "Indoor Plant",
+            "watering_schedule": {
+                "frequency": "weekly",
+                "last_time_watered": 1713008045.2322826
+            },
+            "is_watered": false,
+            "height": "medium",
+            "additional_notes": "Prefers humidity and indirect light, sensitive to overwatering."
+        },
+        {
+            "aruco_code": 5,
+            "name": "Peace Lily",
+            "type": "Indoor Plant",
+            "watering_schedule": {
+                "frequency": "weekly",
+                "last_time_watered": 1713008045.2322826
+            },
+            "is_watered": false,
+            "height": "medium",
+            "additional_notes": "Thrives in low light; keep soil moist but not wet, great at purifying indoor air."
+        },
+        {
+            "aruco_code": 6,
+            "name": "Rubber Plant",
+            "type": "Indoor Plant",
+            "watering_schedule": {
+                "frequency": "biweekly",
+                "last_time_watered": 1713008045.2322826
+            },
+            "is_watered": false,
+            "height": "medium",
+            "additional_notes": "Prefers bright, indirect light and occasional misting."
+        },
+        {
+            "aruco_code": 7,
+            "name": "Boston Fern",
+            "type": "Indoor Plant",
+            "watering_schedule": {
+                "frequency": "weekly",
+                "last_time_watered": 1713008045.2322826
+            },
+            "is_watered": false,
+            "height": "medium",
+            "additional_notes": "Needs high humidity and indirect light, keep the soil consistently moist."
+        },
+        {
+            "aruco_code": 8,
+            "name": "Spider Plant",
+            "type": "Indoor Plant",
+            "watering_schedule": {
+                "frequency": "biweekly",
+                "last_time_watered": 1713008045.2322826
+            },
+            "is_watered": false,
+            "additional_notes": "Very adaptable and easy to care for. Prefers bright, indirect light."
+        },
+        {
+            "aruco_code": 9,
+            "name": "Aloe Vera",
+            "type": "Indoor Plant",
+            "watering_schedule": {
+                "frequency": "biweekly",
+                "last_time_watered": 1713008045.2322826
+            },
+            "is_watered": false,
+            "height": "medium",
+            "additional_notes": "Water deeply but infrequently, requires well-draining soil and bright, indirect sunlight."
+        }
+    ],
+    "current_code": 3
+}

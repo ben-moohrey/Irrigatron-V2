@@ -48,7 +48,7 @@ def cleanup():
 if __name__ == "__main__":
 
     try:
-        move_to_position()
+        move_to_position(3000)
         # while True:
         #     print('test')
         #     num = input("enter num:")
@@ -63,5 +63,5 @@ if __name__ == "__main__":
         # time.sleep(1)                     # Wait for 1 second
 
     finally:
-        home()
+        #home()
         cleanup()

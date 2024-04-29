@@ -5,15 +5,11 @@ name = "pypi"
 
 [packages]
 pyserial = "*"
-matplotlib = "*"
-opencv-python = "*"
-breezyslam = {path = "/home/irrigatron/BreezySLAM/python"}
-roboviz = {path = "/home/irrigatron/PyRoboViz"}
-rplidar = "*"
 "rpi.gpio" = "*"
 opencv-contrib-python = "*"
+breezyslam = {path = "/home/irrigatron/BreezySLAM/python"}
 
 [dev-packages]
 
 [requires]
-python_version = "3.10"
+python_version = "3.11"
