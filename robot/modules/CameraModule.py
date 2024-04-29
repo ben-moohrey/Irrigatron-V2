@@ -26,6 +26,8 @@ class CameraModule(BaseModule):
 
             self.arucode_topic = self.topics.get_topic("arucode_topic")
 
+
+
             # id, position from center
             self.arucode_topic.write_data([])
             self.last_aruco_infomation = []
@@ -68,7 +70,9 @@ class CameraModule(BaseModule):
 
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         ids = []
+
         corners, ids, rejectedImgPoints = self.detector.detectMarkers(gray)
+
 
         # aruco_information[i][0]=id
         # aruco_information[i][1]=distance

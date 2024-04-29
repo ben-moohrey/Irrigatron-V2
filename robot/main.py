@@ -25,7 +25,9 @@ SERIAL_BAUD_RATE = 115200
 MAP_SIZE_PIXELS = 100
 MAP_SIZE_METERS = 10
 def main():
-    # viz = MapVisualizer(MAP_SIZE_PIXELS, MAP_SIZE_METERS, 'SLAM BRUH')
+
+    # viz = MapVisualizer(MAP_SIZE_PIXELS, MAP_SIZE_METERS, 'SLAM')
+
     topics = Topics(settings.get('default_topics'))
     processes = []
     shutdown_flag = multiprocessing.Event()
@@ -65,6 +67,7 @@ def main():
         #         '/dev/ttyUSB0',
         #     ),
         #     'id': 'SimpleLidarModule',
+
         # },
         
     ]
@@ -93,6 +96,7 @@ def main():
     stepper_location_topic =  topics.get_topic("stepper_location_topic")
     obstacle_detected_topic = topics.get_topic('obstacle_detected_topic')
     try:
+
         # stepper_location_topic.write_data(StepperModule.POSITION_HIGH)
         # stepper_location_topic.write_data(100)
         while not shutdown_flag.is_set():
@@ -108,6 +112,7 @@ def main():
             #     # print(x)
             #     # viz.display((x/1000.), (y/1000.), theta, lidar_map)
             # # time.sleep(0.05)
+
 
     except KeyboardInterrupt:
         print('\n[MAIN] > Shutting Down all processes Gracefully \n')
